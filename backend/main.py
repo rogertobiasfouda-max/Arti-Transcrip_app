@@ -197,3 +197,10 @@ async def transcribe_audio(file: UploadFile = File(...)):
 _dist = Path(__file__).parent / "frontend" / "dist"
 if _dist.exists():
     app.mount("/", StaticFiles(directory=str(_dist), html=True), name="static")
+
+
+# ── Point d'entrée (Railway lit PORT directement via os.environ) ────────────
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)

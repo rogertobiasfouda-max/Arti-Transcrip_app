@@ -24,4 +24,4 @@ COPY backend/ .
 COPY --from=frontend-builder /frontend/dist ./frontend/dist
 
 EXPOSE 8080
-CMD ["sh", "-c", "exec uvicorn main:app --host 0.0.0.0 --port $PORT"]
+CMD ["python", "main.py"]

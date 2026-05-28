@@ -9,6 +9,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 
+# Configurer pydub pour utiliser le binaire ffmpeg embarqué dans imageio-ffmpeg
+# (évite d'avoir à installer ffmpeg via apt-get sur le serveur)
+try:
+    import imageio_ffmpeg
+    import pydub
+    pydub.AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
+    pydub.AudioSegment.ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+    pydub.AudioSegment.ffprobe = imageio_ffmpeg.get_ffmpeg_exe()
+except Exception:
+    pass  # Fallback : pydub cherchera ffmpeg dans le PATH
+
 app = FastAPI(title="Actiwork Transcription API")
 
 app.add_middleware(

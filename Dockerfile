@@ -9,9 +9,7 @@ RUN npm run build
 # ── Étape 2 : Backend Python ────────────────────────────────────────────────
 FROM python:3.11-slim
 WORKDIR /app
-
-# ffmpeg : binary statique (évite apt-get et ses timeouts réseau)
-COPY --from=mwader/static-ffmpeg:latest /ffmpeg /usr/local/bin/ffmpeg
+# Pas d'apt-get ffmpeg : imageio-ffmpeg (dans requirements.txt) embarque le binaire
 
 # Dépendances Python
 COPY backend/requirements.txt .

@@ -287,17 +287,62 @@ function SalesAssistant({ transcript }) {
 }
 
 // ── Sales Panel content ──────────────────────────────────────────────────────
+// Data extracted as constants to avoid quote-escaping issues in JSX
+const RESUME_CARDS = [
+  ["Besoin", "Table élévatrice, charge ≤ 4 t"],
+  ["Reco technique", "Motorisation hydraulique"],
+  ["Point de vigilance", "Épaisseur du plateau"],
+  ["Délai fabrication", "8 à 10 semaines"],
+  ["Inclus", "Visite de contrôle + formation"],
+  ["Température", "⚡ Chaud · signaux d’achat"],
+]
+const POINTS_LIST = [
+  "Charge à manipuler jusqu’à <b>4 tonnes</b>, outillage ≈ 1m20 × 1m40.",
+  "Environnement <b>eau uniquement</b> — aucun produit corrosif sur la table.",
+  "Recommandation : <b>hydraulique</b> (pompe électrique) pour stabilité sur fortes charges.",
+  "Vigilance sur <b>l’épaisseur du plateau</b> (risque de déformation à l’usure).",
+  "Délai de fabrication : <b>8 à 10 semaines</b>, hors congés.",
+  "<b>Formation + documentation</b> incluses — atout pour les audits internes du client.",
+]
+const ACTIONS_LIST = [
+  ["us",   "Envoyer la fiche technique + le devis",                    "Aujourd’hui"],
+  ["them", "Compléter & valider la fiche article en interne",      "À venir"],
+  ["them", "Validation avec le responsable de site",                    "À venir"],
+  ["both", "Caler une date pour la suite du projet",                    "À planifier"],
+  ["us",   "Anticiper la prod. si besoin avant fin d’année",  "Congés"],
+]
+const OBJECTIONS_LIST = [
+  ["amber", "Crainte sur l’épaisseur / l’usure du plateau",  "Réponse : plateau dimensionné pour la charge nominale avec coefficient de sécurité."],
+  ["amber", "Mise en service gérée en interne ?",            "Réponse : visite de contrôle incluse pour la première mise en route."],
+  ["green", "Signal d’achat 🟢",                             "Demande explicite de fiche technique + devis, évoque le délai et un besoin avant fin d’année."],
+]
+const EMAIL_BODY = `Table élévatrice atelier — fiche technique & devis
+
+Bonjour,
+
+Suite à notre échange concernant l’équipement de votre atelier maintenance, je vous adresse la fiche technique (dimensions standards et options) ainsi que notre devis.
+
+Quelques points de notre discussion :
+• Motorisation hydraulique recommandée pour vos charges (jusqu’à 4 t)
+• Plateau dimensionné avec coefficient de sécurité (point d’usure que vous évoquiez)
+• Délai de fabrication estimé à 8–10 semaines (hors congés)
+• Visite de contrôle et formation de vos équipes incluses
+
+Je reste à votre disposition pour toute question et pour caler ensemble la suite.
+
+Bien cordialement,`
+
 function SalesPanel({ tab, onCopy }) {
   if (tab === 'resume') return (
     <div>
       <p style={{ fontSize: 14.5, lineHeight: 1.65, color: 'var(--ink-soft)' }}>
-        Le site <b style={{ color:'var(--ink)', fontWeight:700 }}>Tréport Néméra</b> (injection plastique de dispositifs médicaux) souhaite équiper son atelier maintenance d'une <b style={{ color:'var(--ink)', fontWeight:700 }}>table élévatrice</b> pour manipuler des outillages lourds (jusqu'à 4 tonnes) et faciliter le travail à hauteur. Demande portée au niveau groupe, environnement <b style={{ color:'var(--ink)', fontWeight:700 }}>sans produit corrosif</b> (eau uniquement).
+        Le site <b style={{ color:'var(--ink)', fontWeight:700 }}>Tréport Néméra</b> (injection plastique de dispositifs médicaux) souhaite équiper son atelier maintenance d’une <b style={{ color:'var(--ink)', fontWeight:700 }}>table élévatrice</b> pour manipuler des outillages lourds (jusqu’à 4 tonnes) et faciliter le travail à hauteur. Demande portée au niveau groupe, environnement <b style={{ color:'var(--ink)', fontWeight:700 }}>sans produit corrosif</b> (eau uniquement).
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 16 }}>
-        {[['Besoin','Table élévatrice, charge ≤ 4 t'],['Reco technique','Motorisation hydraulique'],['Point de vigilance','Épaisseur du plateau'],['Délai fabrication','8 à 10 semaines'],['Inclus','Visite de contrôle + formation'],['Température','⚡ Chaud · signaux d\'achat']].map(([k,v]) => (
+        {RESUME_CARDS.map(([k, v]) => (
           <div key={k} style={{ display: 'flex', flexDirection: 'column', gap: 3, background: 'var(--bg-warm)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '11px 14px' }}>
             <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--ink-faint)' }}>{k}</span>
-            <span style={{ fontSize: 13.5, fontWeight: 700, color: k==='Température' ? 'var(--ac-red)' : 'var(--ink)' }}>{v}</span>
+            <span style={{ fontSize: 13.5, fontWeight: 700, color: k === 'Température' ? 'var(--ac-red)' : 'var(--ink)' }}>{v}</span>
           </div>
         ))}
       </div>
@@ -307,7 +352,7 @@ function SalesPanel({ tab, onCopy }) {
   if (tab === 'points') return (
     <div>
       <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 11 }}>
-        {['Charge à manipuler jusqu'à <b>4 tonnes</b>, outillage ≈ 1m20 × 1m40.','Environnement <b>eau uniquement</b> — aucun produit corrosif sur la table.','Recommandation : <b>hydraulique</b> (pompe électrique) pour stabilité sur fortes charges.','Vigilance sur <b>l\'épaisseur du plateau</b> (risque de déformation à l\'usure).','Délai de fabrication : <b>8 à 10 semaines</b>, hors congés.','<b>Formation + documentation</b> incluses — atout pour les audits internes du client.'].map((li,i) => (
+        {POINTS_LIST.map((li, i) => (
           <li key={i} style={{ position: 'relative', paddingLeft: 26, fontSize: 14, lineHeight: 1.55, color: 'var(--ink-soft)' }}>
             <span style={{ position: 'absolute', left: 4, top: 7, width: 8, height: 8, borderRadius: '50%', background: 'var(--ac-red)', boxShadow: '0 0 0 3px var(--ac-red-tint)', display: 'block' }} />
             <span dangerouslySetInnerHTML={{ __html: li }} />
@@ -319,10 +364,10 @@ function SalesPanel({ tab, onCopy }) {
   )
   if (tab === 'actions') return (
     <div>
-      {[['us','Envoyer la fiche technique + le devis','Aujourd\'hui'],['them','Compléter & valider la fiche article en interne','À venir'],['them','Validation avec le responsable de site','À venir'],['both','Caler une date pour la suite du projet','À planifier'],['us','Anticiper la prod. si besoin avant fin d\'année','Congés']].map(([who,tx,due],i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: i<4 ? '1px solid var(--border)' : 'none' }}>
-          <span style={{ flexShrink: 0, fontSize: 10.5, fontWeight: 800, letterSpacing: '.4px', padding: '4px 9px', borderRadius: 99, minWidth: 64, textAlign: 'center', background: who==='us' ? 'var(--ac-red-tint)' : who==='them' ? '#e4eefb' : '#eef0f2', color: who==='us' ? 'var(--ac-red-dark)' : who==='them' ? '#2455a8' : 'var(--ink-soft)' }}>
-            {who==='us' ? 'Nous' : who==='them' ? 'Client' : 'Ensemble'}
+      {ACTIONS_LIST.map(([who, tx, due], i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', borderBottom: i < 4 ? '1px solid var(--border)' : 'none' }}>
+          <span style={{ flexShrink: 0, fontSize: 10.5, fontWeight: 800, letterSpacing: '.4px', padding: '4px 9px', borderRadius: 99, minWidth: 64, textAlign: 'center', background: who === 'us' ? 'var(--ac-red-tint)' : who === 'them' ? '#e4eefb' : '#eef0f2', color: who === 'us' ? 'var(--ac-red-dark)' : who === 'them' ? '#2455a8' : 'var(--ink-soft)' }}>
+            {who === 'us' ? 'Nous' : who === 'them' ? 'Client' : 'Ensemble'}
           </span>
           <span style={{ flex: 1, fontSize: 14, color: 'var(--ink)', fontWeight: 500 }}>{tx}</span>
           <span style={{ flexShrink: 0, fontSize: 11.5, fontWeight: 600, color: 'var(--ink-muted)' }}>{due}</span>
@@ -333,22 +378,24 @@ function SalesPanel({ tab, onCopy }) {
   )
   if (tab === 'objections') return (
     <div>
-      {[['amber','Crainte sur l\'épaisseur / l\'usure du plateau','Réponse : plateau dimensionné pour la charge nominale avec coefficient de sécurité.'],['amber','Mise en service gérée en interne ?','Réponse : visite de contrôle incluse pour la première mise en route.'],['green','Signal d\'achat 🟢','Demande explicite de fiche technique + devis, évoque le délai et un besoin avant fin d\'année.']].map(([sev,ot,oa],i) => (
-        <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderBottom: i<2 ? '1px solid var(--border)' : 'none' }}>
-          <span style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, marginTop: 4, background: sev==='amber' ? '#f0a020' : '#22a06b', boxShadow: sev==='amber' ? '0 0 0 3px #fdf0d8' : '0 0 0 3px #d9f2e6', display: 'inline-block' }} />
+      {OBJECTIONS_LIST.map(([sev, ot, oa], i) => (
+        <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
+          <span style={{ width: 10, height: 10, borderRadius: '50%', flexShrink: 0, marginTop: 4, background: sev === 'amber' ? '#f0a020' : '#22a06b', boxShadow: sev === 'amber' ? '0 0 0 3px #fdf0d8' : '0 0 0 3px #d9f2e6', display: 'inline-block' }} />
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--ink)' }}>{ot}</div>
             <div style={{ fontSize: 13, color: 'var(--ink-soft)', marginTop: 3, lineHeight: 1.5 }}>{oa}</div>
           </div>
         </div>
       ))}
-      <CopyBtn onClick={() => onCopy('Analyse copiée')} label="Copier l'analyse" />
+      <CopyBtn onClick={() => onCopy('Analyse copiée')} label="Copier l’analyse" />
     </div>
   )
   if (tab === 'email') return (
     <div>
-      <pre style={{ fontFamily: 'var(--font)', fontSize: 13.5, lineHeight: 1.65, color: 'var(--ink-soft)', background: 'var(--paper)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '16px 18px', whiteSpace: 'pre-wrap', textWrap: 'pretty' }}><span style={{ fontWeight: 700, color: 'var(--ink)' }}>Objet :</span>{` Table élévatrice atelier — fiche technique & devis\n\nBonjour,\n\nSuite à notre échange concernant l'équipement de votre atelier maintenance, je vous adresse la fiche technique (dimensions standards et options) ainsi que notre devis.\n\nQuelques points de notre discussion :\n• Motorisation hydraulique recommandée pour vos charges (jusqu'à 4 t)\n• Plateau dimensionné avec coefficient de sécurité (point d'usure que vous évoquiez)\n• Délai de fabrication estimé à 8–10 semaines (hors congés)\n• Visite de contrôle et formation de vos équipes incluses\n\nJe reste à votre disposition pour toute question et pour caler ensemble la suite.\n\nBien cordialement,`}</pre>
-      <CopyBtn onClick={() => onCopy('E-mail copié')} label="Copier l'e-mail" />
+      <pre style={{ fontFamily: 'var(--font)', fontSize: 13.5, lineHeight: 1.65, color: 'var(--ink-soft)', background: 'var(--paper)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '16px 18px', whiteSpace: 'pre-wrap' }}>
+        <b style={{ color: 'var(--ink)' }}>Objet :</b>{'\n'}{EMAIL_BODY}
+      </pre>
+      <CopyBtn onClick={() => onCopy('E-mail copié')} label="Copier l’e-mail" />
     </div>
   )
   return null

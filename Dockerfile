@@ -11,7 +11,10 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # ffmpeg requis par pydub pour les fichiers > 25 Mo
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -o Acquire::Retries=3 && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Dépendances Python
 COPY backend/requirements.txt .

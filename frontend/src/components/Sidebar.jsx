@@ -9,9 +9,9 @@ export default function Sidebar() {
     <aside style={{ background: 'var(--card)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflowY: 'auto', minHeight: 0 }}>
 
       {/* Brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '22px 22px 18px' }}>
-        <div className="brand-mark" style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(155deg, #3a3a3a 0%, #1a1a1a 55%, #0c0c0c 100%)', display: 'grid', placeItems: 'center', flexShrink: 0, position: 'relative', isolation: 'isolate', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 4px rgba(0,0,0,.10), 0 2px 4px rgba(20,18,16,.10), 0 5px 12px rgba(20,18,16,.10)' }}>
-          <MicIcon style={{ width: 20, height: 20, color: '#fff', position: 'relative', zIndex: 2, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.18))' }} />
+      <div className="brand-wrap" style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '22px 22px 18px', cursor: 'default' }}>
+        <div className="brand-mark icon-3d" style={{ width: 38, height: 38, borderRadius: 11, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+          <MicIcon style={{ width: 20, height: 20, color: '#fff' }} />
         </div>
         <div>
           <div style={{ lineHeight: 1 }}>
@@ -25,7 +25,7 @@ export default function Sidebar() {
       {/* Free card */}
       <div style={{ margin: '4px 16px 20px', padding: '15px 16px', borderRadius: 'var(--r-md)', background: 'linear-gradient(160deg, var(--ac-red-wash), #fff)', border: '1px solid var(--ac-red-line)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 9, background: 'linear-gradient(155deg, #ff5a4f, var(--ac-red) 55%, var(--ac-red-dark))', color: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0, boxShadow: 'var(--shadow-red)', animation: 'badge-bob 4.5s ease infinite' }}>
+          <div className="icon-3d freecard-dot" style={{ width: 30, height: 30, borderRadius: 9, background: 'linear-gradient(155deg, #ff5a4f, var(--ac-red) 55%, var(--ac-red-dark))', color: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0, animation: 'badge-bob 4.5s ease infinite' }}>
             <CheckIcon style={{ width: 16, height: 16 }} />
           </div>
           <div>
@@ -49,9 +49,9 @@ export default function Sidebar() {
       <div style={{ padding: '0 16px', flex: 1 }}>
         <div style={navLabelStyle}>Récents</div>
         {RECENT_FILES.map((f, i) => (
-          <div key={i} style={recentItemStyle} onMouseEnter={e => e.currentTarget.style.background='var(--bg-warm)'} onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-            <div style={recentIconStyle}>
-              <MusicIcon style={{ width: 15, height: 15, color: 'var(--ink-muted)', position: 'relative', zIndex: 2 }} />
+          <div key={i} className="icon-lift" style={recentItemStyle} onMouseEnter={e => e.currentTarget.style.background='var(--bg-warm)'} onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+            <div className="icon-3d icon-neutral" style={recentIconStyle}>
+              <MusicIcon style={{ width: 15, height: 15, color: 'var(--ink-muted)' }} />
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>{f.name}</div>
@@ -79,7 +79,7 @@ export default function Sidebar() {
 function NavItem({ icon, label, active, badge }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '9px 11px', borderRadius: 'var(--r)', fontSize: 13.5, fontWeight: active ? 700 : 600, color: active ? 'var(--ac-red-deep)' : 'var(--ink-soft)', background: active ? 'var(--ac-red-tint)' : 'transparent', cursor: 'pointer', marginBottom: 2 }}>
-      <span style={{ color: active ? 'var(--ac-red)' : 'var(--ink-muted)', display: 'flex' }}>{icon}</span>
+      <span className={active ? 'nav-icon nav-icon-active' : 'nav-icon'} style={{ color: active ? 'var(--ac-red)' : 'var(--ink-muted)', display: 'flex' }}>{icon}</span>
       <span style={{ flex: 1 }}>{label}</span>
       {badge && <span style={{ fontSize: 10.5, fontWeight: 800, background: active ? 'var(--ac-red)' : 'var(--ink)', color: '#fff', minWidth: 19, height: 19, padding: '0 5px', borderRadius: 99, display: 'grid', placeItems: 'center' }}>{badge}</span>}
     </div>

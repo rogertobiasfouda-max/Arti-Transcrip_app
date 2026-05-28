@@ -59,3 +59,80 @@ html, body { height: 100%; font-family: var(--font); color: var(--ink); backgrou
 /* Live dot pulse */
 @keyframes live-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,160,107,.4); } 50% { box-shadow: 0 0 0 5px rgba(34,160,107,0); } }
 .live-dot { animation: live-pulse 2s ease infinite; }
+
+/* ── Nav icon pop animation ─────────────────────────────────────────────── */
+@keyframes nav-pop { 0% { transform: scale(.7); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+/* ── 3D / Dynamic icon treatment ────────────────────────────────────────── */
+/* Shared bevel + gloss for coloured icon tiles */
+.icon-3d {
+  position: relative;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.45),
+    inset 0 -2px 4px rgba(0,0,0,.10),
+    0 2px 4px rgba(20,18,16,.10),
+    0 5px 12px rgba(20,18,16,.10);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+  will-change: transform;
+}
+.icon-3d::after {
+  content: "";
+  position: absolute; inset: 0; border-radius: inherit;
+  background:
+    radial-gradient(120% 80% at 28% 12%, rgba(255,255,255,.55), rgba(255,255,255,0) 55%),
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.10));
+  pointer-events: none; z-index: 1;
+  mix-blend-mode: soft-light;
+}
+.icon-3d svg { position: relative; z-index: 2; filter: drop-shadow(0 1px 1px rgba(0,0,0,.18)); transition: transform .35s var(--ease); }
+
+/* Brand mark: dark gradient + tilt on hover */
+.brand-mark {
+  background: linear-gradient(155deg, #3a3a3a 0%, #1a1a1a 55%, #0c0c0c 100%) !important;
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.brand-wrap:hover .brand-mark { transform: translateY(-2px) rotate(-6deg) scale(1.06); }
+.brand-wrap:hover .brand-mark svg { transform: scale(1.08); }
+
+/* Recent + action tiles: soft neutral relief */
+.icon-neutral {
+  background: linear-gradient(160deg, #ffffff 0%, #f1efeb 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -2px 3px rgba(0,0,0,.05),
+    0 2px 5px rgba(20,18,16,.08) !important;
+}
+.icon-lift:hover .icon-neutral {
+  transform: translateY(-2px) scale(1.07);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 5px 14px rgba(20,18,16,.16) !important;
+}
+.icon-lift:hover .icon-neutral svg { transform: rotate(-7deg) scale(1.08); }
+
+/* Export format tiles: pop & rotate on hover */
+.fmt-tile:hover .icon-3d { transform: translateY(-3px) scale(1.1) rotate(-5deg); box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 8px 18px rgba(20,18,16,.20); }
+.fmt-tile:hover .icon-3d svg { transform: scale(1.12); }
+
+/* Nav icons: lift on hover, bounce when active */
+.nav-icon { transition: transform .3s var(--ease), color .18s; }
+.nav-icon:hover { transform: translateY(-1px) scale(1.12); }
+.nav-icon-active { filter: drop-shadow(0 2px 3px rgba(226,35,26,.35)); animation: nav-pop .5s var(--ease); }
+
+/* Skip buttons: scale on hover */
+.skip-btn { transition: background .18s, transform .3s var(--ease) !important; }
+.skip-btn:hover { transform: scale(1.1) !important; }
+
+/* Top-bar icon button: lift + bell rotate */
+.iconbtn-3d { transition: background .18s, border-color .18s, transform .3s var(--ease) !important; }
+.iconbtn-3d:hover { transform: translateY(-2px) !important; }
+.iconbtn-3d:hover svg { transform: rotate(12deg); transition: transform .3s var(--ease); }
+
+/* New transcription button: "+" rotates 90° on hover */
+.btn-new-plus { transition: transform .3s var(--ease) !important; }
+.btn-new:hover .btn-new-plus { transform: rotate(90deg) !important; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .freecard-dot, .live-dot { animation: none !important; }
+  * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

@@ -7,11 +7,11 @@ export default function Header({ onNew }) {
         <a href="#" style={navStyle(false)}>Aide</a>
       </nav>
       <div style={{ flex: 1 }} />
-      <button onClick={onNew} style={btnNewStyle}>
-        <PlusIcon style={{ width: 16, height: 16 }} />
+      <button onClick={onNew} className="btn-new" style={btnNewStyle}>
+        <PlusIcon className="btn-new-plus" style={{ width: 16, height: 16 }} />
         Nouvelle transcription
       </button>
-      <button style={iconBtnStyle} title="Notifications">
+      <button className="iconbtn-3d" style={iconBtnStyle} title="Notifications">
         <BellIcon style={{ width: 18, height: 18 }} />
       </button>
     </header>

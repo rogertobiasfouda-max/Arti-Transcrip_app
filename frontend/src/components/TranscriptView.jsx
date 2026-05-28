@@ -112,12 +112,9 @@ function AudioPlayer({ segments }) {
           {rate}×
         </button>
       </div>
-      {/* expose active index via ref for parent */}
-      <AudioPlayer._ai = ai />
     </div>
   )
 }
-AudioPlayer._ai = 0
 
 const skipStyle = { width: 34, height: 34, borderRadius: '50%', flexShrink: 0, background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.12)', color: 'rgba(255,255,255,.85)', cursor: 'pointer', display: 'grid', placeItems: 'center', position: 'relative', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.12), 0 2px 5px rgba(0,0,0,.25)' }
 

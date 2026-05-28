@@ -3,20 +3,20 @@ import { useState, useRef, useCallback } from 'react'
 const ACCEPTED = '.mp3,.wav,.m4a,.ogg,.webm,.flac,.mp4'
 
 const FORMATS = [
-  { ext: 'MP3',  color: 'bg-orange-100 text-orange-600 border-orange-200' },
-  { ext: 'WAV',  color: 'bg-blue-100 text-blue-600 border-blue-200' },
-  { ext: 'M4A',  color: 'bg-purple-100 text-purple-600 border-purple-200' },
-  { ext: 'OGG',  color: 'bg-green-100 text-green-600 border-green-200' },
-  { ext: 'FLAC', color: 'bg-pink-100 text-pink-600 border-pink-200' },
-  { ext: 'WEBM', color: 'bg-yellow-100 text-yellow-600 border-yellow-200' },
-  { ext: 'MP4',  color: 'bg-indigo-100 text-indigo-600 border-indigo-200' },
+  { ext: 'MP3',  c: '#f59e0b', bg: '#fffbeb' },
+  { ext: 'WAV',  c: '#3b82f6', bg: '#eff6ff' },
+  { ext: 'M4A',  c: '#8b5cf6', bg: '#f5f3ff' },
+  { ext: 'OGG',  c: '#10b981', bg: '#ecfdf5' },
+  { ext: 'FLAC', c: '#ec4899', bg: '#fdf2f8' },
+  { ext: 'WEBM', c: '#6366f1', bg: '#eef2ff' },
+  { ext: 'MP4',  c: '#14b8a6', bg: '#f0fdfa' },
 ]
 
 const FEATURES = [
-  { icon: LightningIcon, text: 'OpenAI Whisper',   color: 'text-yellow-500' },
-  { icon: TargetIcon,    text: 'Précision > 95%',  color: 'text-green-500' },
-  { icon: ClockIcon,     text: '~2 min / 30 min',  color: 'text-blue-500' },
-  { icon: ShieldIcon,    text: 'Données sécurisées', color: 'text-purple-500' },
+  { icon: LightningIcon, text: 'OpenAI Whisper',    color: '#f59e0b' },
+  { icon: TargetIcon,    text: 'Précision > 95 %',  color: '#10b981' },
+  { icon: ClockIcon,     text: '~2 min / 30 min',   color: 'var(--ac-red)' },
+  { icon: ShieldIcon,    text: 'Données sécurisées', color: '#8b5cf6' },
 ]
 
 export default function UploadZone({ onUpload }) {
@@ -35,16 +35,16 @@ export default function UploadZone({ onUpload }) {
     b < 1024 * 1024 ? `${(b / 1024).toFixed(0)} KB` : `${(b / (1024 * 1024)).toFixed(1)} MB`
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 animate-fade-in-up">
-      <div className="w-full max-w-2xl">
+    <div className="animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '0 24px' }}>
+      <div style={{ width: '100%', maxWidth: 600 }}>
 
-        {/* Hero text */}
-        <div className="text-center mb-7">
-          <h2 className="text-2xl font-extrabold text-acti-dark mb-2 leading-tight">
+        {/* Hero */}
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <h2 style={{ fontSize: 26, fontWeight: 900, color: 'var(--ink)', letterSpacing: '-.7px', lineHeight: 1.2, marginBottom: 8 }}>
             Transcription audio{' '}
-            <span className="gradient-text">intelligente</span>
+            <span style={{ color: 'var(--ac-red)' }}>intelligente</span>
           </h2>
-          <p className="text-sm text-acti-muted max-w-md mx-auto">
+          <p style={{ fontSize: 13.5, color: 'var(--ink-muted)', maxWidth: 400, margin: '0 auto', lineHeight: 1.55 }}>
             Déposez votre fichier audio et obtenez une transcription précise avec horodatages en quelques secondes.
           </p>
         </div>
@@ -57,86 +57,94 @@ export default function UploadZone({ onUpload }) {
           onClick={() => !selectedFile && inputRef.current?.click()}
           role="button"
           tabIndex={0}
-          aria-label="Zone de dépôt de fichier audio. Cliquez ou glissez un fichier."
           onKeyDown={(e) => e.key === 'Enter' && !selectedFile && inputRef.current?.click()}
-          className={`
-            relative rounded-2xl p-12 text-center select-none overflow-hidden
-            border-2 transition-all duration-300
-            ${dragging
-              ? 'border-acti-blue bg-gradient-to-br from-blue-50 to-indigo-50/40 shadow-blue scale-[1.01] cursor-copy'
+          style={{
+            position: 'relative', borderRadius: 'var(--r-xl)', padding: '52px 32px',
+            textAlign: 'center', cursor: selectedFile ? 'default' : 'pointer',
+            border: dragging
+              ? '2px solid var(--ac-red)'
               : selectedFile
-                ? 'border-green-400 bg-gradient-to-br from-green-50/60 to-emerald-50/30 cursor-default shadow-card'
-                : 'border-dashed border-gray-200 bg-white hover:border-acti-blue hover:bg-blue-50/30 hover:shadow-card cursor-pointer'
-            }
-          `}
+                ? '2px solid #22c55e'
+                : '2px dashed var(--border-strong)',
+            background: dragging
+              ? 'linear-gradient(160deg, var(--ac-red-wash), #fff9)'
+              : selectedFile
+                ? 'linear-gradient(160deg, #f0fdf4, #fff)'
+                : 'var(--card)',
+            boxShadow: dragging
+              ? '0 0 0 4px rgba(226,35,26,.08), var(--shadow)'
+              : 'var(--shadow)',
+            transform: dragging ? 'scale(1.01)' : 'none',
+            transition: 'all .25s var(--ease)',
+            overflow: 'hidden',
+          }}
         >
-          <input
-            ref={inputRef}
-            type="file"
-            accept={ACCEPTED}
-            className="hidden"
-            onChange={(e) => handleFile(e.target.files[0])}
-          />
+          <input ref={inputRef} type="file" accept={ACCEPTED} style={{ display: 'none' }} onChange={(e) => handleFile(e.target.files[0])} />
 
-          {/* Background decor */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-acti-blue/3 to-transparent rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-acti-red/3 to-transparent rounded-full translate-y-1/2 -translate-x-1/3 pointer-events-none" />
+          {/* BG decor */}
+          <div style={{ position: 'absolute', top: 0, right: 0, width: 180, height: 180, background: 'radial-gradient(circle, rgba(226,35,26,.04) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, width: 120, height: 120, background: 'radial-gradient(circle, rgba(226,35,26,.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
           {!selectedFile ? (
-            <div className="relative">
-              {/* Animated icon */}
-              <div className={`relative w-20 h-20 mx-auto mb-5 ${dragging ? 'scale-110' : 'animate-float'} transition-transform duration-300`}>
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-acti-blue to-blue-400 shadow-blue flex items-center justify-center">
-                  <MicBigIcon className="w-9 h-9 text-white" />
+            <div style={{ position: 'relative' }}>
+              {/* Mic icon */}
+              <div style={{
+                position: 'relative', width: 72, height: 72, margin: '0 auto 20px',
+                transform: dragging ? 'scale(1.12)' : 'none', transition: 'transform .3s var(--ease)',
+              }}>
+                <div style={{
+                  width: 72, height: 72, borderRadius: 20,
+                  background: 'radial-gradient(140% 100% at 30% 10%, rgba(255,255,255,.35), rgba(255,255,255,0) 50%), linear-gradient(160deg, #ff5a4f, var(--ac-red) 55%, var(--ac-red-dark))',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-red)',
+                  display: 'grid', placeItems: 'center', color: '#fff',
+                }}>
+                  <MicBigIcon />
                 </div>
                 {dragging && (
                   <>
-                    <div className="absolute inset-0 rounded-2xl bg-acti-blue/20 animate-ping" />
-                    <div className="absolute -inset-3 rounded-3xl bg-acti-blue/10 animate-ping" style={{ animationDelay: '200ms' }} />
+                    <div style={{ position: 'absolute', inset: 0, borderRadius: 20, background: 'var(--ac-red)', opacity: .2, animation: 'pulse-ring 1s ease-out infinite' }} />
+                    <div style={{ position: 'absolute', inset: -10, borderRadius: 28, background: 'var(--ac-red)', opacity: .1, animation: 'pulse-ring 1s ease-out infinite', animationDelay: '.2s' }} />
                   </>
                 )}
               </div>
 
-              <h3 className="text-lg font-bold text-acti-dark mb-1.5">
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: 'var(--ink)', letterSpacing: '-.4px', marginBottom: 6 }}>
                 {dragging ? '📂 Relâchez pour déposer' : 'Glissez votre fichier audio ici'}
               </h3>
-              <p className="text-sm text-gray-400 mb-6">
+              <p style={{ fontSize: 13, color: 'var(--ink-muted)', marginBottom: 22 }}>
                 ou{' '}
-                <span className="text-acti-blue font-semibold underline underline-offset-2 hover:text-blue-700">
+                <span style={{ color: 'var(--ac-red)', fontWeight: 700, textDecoration: 'underline', textUnderlineOffset: 3 }}>
                   cliquez pour parcourir
                 </span>
               </p>
 
               {/* Format pills */}
-              <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-                {FORMATS.map(({ ext, color }) => (
-                  <span key={ext} className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${color}`}>
-                    {ext}
-                  </span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 6, marginBottom: 14 }}>
+                {FORMATS.map(({ ext, c, bg }) => (
+                  <span key={ext} style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 99, background: bg, color: c, border: `1px solid ${c}22` }}>{ext}</span>
                 ))}
               </div>
-              <p className="text-xs text-gray-300 font-medium">Taille maximale · 100 Mo</p>
+              <p style={{ fontSize: 11.5, color: 'var(--ink-faint)', fontWeight: 600 }}>Taille maximale · 100 Mo</p>
             </div>
           ) : (
-            <div className="relative animate-fade-in">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 shadow-lg flex items-center justify-center">
-                <CheckIcon className="w-8 h-8 text-white" />
+            <div style={{ position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 18, background: 'linear-gradient(160deg, #4ade80, #16a34a)', boxShadow: '0 6px 20px rgba(22,163,74,.3)', display: 'grid', placeItems: 'center', margin: '0 auto 16px', color: '#fff' }}>
+                <CheckBigIcon />
               </div>
-              <p className="font-bold text-gray-800 text-lg mb-1.5 truncate max-w-sm mx-auto px-4">
+              <p style={{ fontSize: 17, fontWeight: 800, color: 'var(--ink)', letterSpacing: '-.4px', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 400, margin: '0 auto 6px' }}>
                 {selectedFile.name}
               </p>
-              <div className="flex items-center justify-center gap-3 text-sm text-gray-500 mb-4">
-                <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
-                  <HddIcon className="w-3.5 h-3.5" />
-                  <span className="text-xs font-medium">{formatSize(selectedFile.size)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 600, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 99, padding: '3px 12px', color: 'var(--ink-soft)' }}>
+                  {formatSize(selectedFile.size)}
                 </span>
-                <span className="flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                  <span className="text-xs font-semibold">✓ Prêt à transcrire</span>
+                <span style={{ fontSize: 11.5, fontWeight: 700, background: '#dcfce7', color: '#16a34a', borderRadius: 99, padding: '3px 12px' }}>
+                  ✓ Prêt à transcrire
                 </span>
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); setSelected(null); inputRef.current?.click() }}
-                className="text-xs text-acti-blue hover:underline font-medium"
+                style={{ fontSize: 12, color: 'var(--ac-red)', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3 }}
               >
                 Changer de fichier
               </button>
@@ -148,24 +156,30 @@ export default function UploadZone({ onUpload }) {
         {selectedFile && (
           <button
             onClick={() => onUpload(selectedFile)}
-            className="mt-4 w-full bg-gradient-to-r from-acti-blue via-blue-600 to-blue-500 text-white font-bold py-4 rounded-2xl
-                       hover:from-blue-700 hover:to-blue-500 active:scale-[0.99] transition-all duration-200
-                       shadow-blue hover:shadow-blue-lg
-                       focus:outline-none focus:ring-2 focus:ring-acti-blue focus:ring-offset-2
-                       flex items-center justify-center gap-3 text-base tracking-wide"
+            style={{
+              marginTop: 14, width: '100%',
+              background: 'radial-gradient(140% 100% at 30% 10%, rgba(255,255,255,.35), rgba(255,255,255,0) 50%), linear-gradient(160deg, #ff5a4f, var(--ac-red) 55%, var(--ac-red-dark))',
+              color: '#fff', fontSize: 14, fontWeight: 800, letterSpacing: '-.2px',
+              padding: '15px 24px', border: 'none', borderRadius: 'var(--r-lg)', cursor: 'pointer',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,.35), var(--shadow-red)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              transition: 'opacity .2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '.92'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
           >
-            <WaveIcon className="w-5 h-5" />
+            <WaveIcon />
             Lancer la transcription
-            <ArrowRightIcon className="w-4 h-4" />
+            <ArrowIcon />
           </button>
         )}
 
         {/* Feature pills */}
-        <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-2.5">
+        <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {FEATURES.map(({ icon: Icon, text, color }) => (
-            <div key={text} className="flex items-center gap-2.5 bg-white rounded-xl px-3 py-2.5 border border-gray-100 shadow-sm hover:shadow-card transition-shadow">
-              <Icon className={`w-4 h-4 flex-shrink-0 ${color}`} />
-              <span className="text-[11px] text-gray-600 font-medium leading-snug">{text}</span>
+            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--r)', padding: '9px 12px', boxShadow: 'var(--shadow-sm)' }}>
+              <Icon color={color} />
+              <span style={{ fontSize: 11, color: 'var(--ink-soft)', fontWeight: 600, lineHeight: 1.35 }}>{text}</span>
             </div>
           ))}
         </div>
@@ -174,31 +188,28 @@ export default function UploadZone({ onUpload }) {
   )
 }
 
-/* ── Icons ── */
-function MicBigIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+/* Icons */
+function MicBigIcon() {
+  return <svg style={{ width: 34, height: 34 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
 }
-function CheckIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+function CheckBigIcon() {
+  return <svg style={{ width: 28, height: 28 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
 }
-function HddIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="2" strokeWidth="1.5" /><circle cx="18" cy="12" r="1" fill="currentColor" /><circle cx="14" cy="12" r="1" fill="currentColor" /></svg>
+function WaveIcon() {
+  return <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
 }
-function WaveIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" /></svg>
+function ArrowIcon() {
+  return <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
 }
-function ArrowRightIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+function LightningIcon({ color }) {
+  return <svg style={{ width: 15, height: 15, color }} fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
 }
-function LightningIcon({ className }) {
-  return <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+function TargetIcon({ color }) {
+  return <svg style={{ width: 15, height: 15, color }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
 }
-function TargetIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="1.5" /><circle cx="12" cy="12" r="6" strokeWidth="1.5" /><circle cx="12" cy="12" r="2" strokeWidth="1.5" /></svg>
+function ClockIcon({ color }) {
+  return <svg style={{ width: 15, height: 15, color }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
 }
-function ClockIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="1.5" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6v6l4 2" /></svg>
-}
-function ShieldIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+function ShieldIcon({ color }) {
+  return <svg style={{ width: 15, height: 15, color }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
 }

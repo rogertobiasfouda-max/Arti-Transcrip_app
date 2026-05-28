@@ -12,9 +12,6 @@ export default function App() {
   const [transcript, setTranscript] = useState(null)
   const [error, setError]           = useState(null)
   const [showTimestamps, setShowTimestamps] = useState(true)
-  const [quotaUsed, setQuotaUsed] = useState(() =>
-    parseInt(localStorage.getItem('actiwork_quota') || '0', 10)
-  )
 
   const handleUpload = useCallback(async (file) => {
     setStatus('processing')
@@ -33,14 +30,11 @@ export default function App() {
       const data = await res.json()
       setTranscript(data)
       setStatus('done')
-      const n = quotaUsed + 1
-      setQuotaUsed(n)
-      localStorage.setItem('actiwork_quota', String(n))
     } catch (err) {
       setError(err.message)
       setStatus('error')
     }
-  }, [quotaUsed])
+  }, [])
 
   const handleReset = () => {
     setStatus('idle')
@@ -49,20 +43,21 @@ export default function App() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-acti-bg bg-grid-pattern font-sans">
-      <Header />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--bg)', fontFamily: 'var(--font)', overflow: 'hidden' }}>
 
-      <div className="flex flex-1 overflow-hidden">
+      <Header onNew={handleReset} />
 
-        {/* Sidebar gauche */}
-        <aside className="hidden lg:flex flex-col w-[268px] bg-white border-r border-gray-100/80 overflow-y-auto flex-shrink-0 shadow-sm">
-          <Sidebar quotaUsed={quotaUsed} />
-        </aside>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '264px minmax(0, 1fr) 296px', overflow: 'hidden', minHeight: 0 }}>
 
-        {/* Contenu central */}
-        <main className="flex-1 overflow-y-auto p-6">
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Main content */}
+        <main style={{ overflowY: 'auto', background: 'var(--bg)' }}>
           {error && (
-            <ErrorBanner message={error} onClose={() => setError(null)} />
+            <div style={{ padding: '16px 24px 0' }}>
+              <ErrorBanner message={error} onClose={() => setError(null)} />
+            </div>
           )}
 
           {(status === 'idle' || status === 'error') && (
@@ -81,10 +76,8 @@ export default function App() {
           )}
         </main>
 
-        {/* Panneau export droit */}
-        <aside className="hidden lg:flex flex-col w-[240px] bg-white border-l border-gray-100/80 overflow-y-auto flex-shrink-0 shadow-sm">
-          <ExportPanel transcript={transcript} />
-        </aside>
+        {/* Export panel */}
+        <ExportPanel transcript={transcript} />
       </div>
     </div>
   )

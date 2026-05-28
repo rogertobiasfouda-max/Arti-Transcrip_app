@@ -1,181 +1,100 @@
-const QUOTA_MAX = 3
-
 const RECENT_FILES = [
-  { name: 'Réunion_équipe_23mai', date: 'il y a 2h', duration: '32 min' },
-  { name: 'Appel_client_ACME', date: 'hier', duration: '18 min' },
-  { name: 'Interview_podcast_ep12', date: '26 mai', duration: '54 min' },
+  { name: 'Réunion_équipe_23mai', time: 'il y a 2h', dur: '32 min' },
+  { name: 'Appel_client_ACME',    time: 'hier',      dur: '18 min' },
+  { name: 'Interview_podcast_ep12', time: '26 mai',  dur: '54 min' },
 ]
 
-export default function Sidebar({ quotaUsed }) {
-  const used = Math.min(quotaUsed, QUOTA_MAX)
-  const pct  = used / QUOTA_MAX
-
-  // SVG circular progress
-  const r = 26
-  const circ = 2 * Math.PI * r
-  const offset = circ - pct * circ
-  const ringColor = used >= QUOTA_MAX ? '#E1251B' : '#3B82F6'
-
+export default function Sidebar() {
   return (
-    <div className="flex flex-col h-full bg-white">
+    <aside style={{ background: 'var(--card)', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflowY: 'auto', minHeight: 0 }}>
 
-      {/* Quota card — dark premium */}
-      <div className="m-3 rounded-xl bg-gradient-to-br from-[#1a2235] to-[#232d42] text-white p-4 shadow-lifted">
-        {/* Ring + info */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="relative flex-shrink-0">
-            <svg width="60" height="60" className="-rotate-90" aria-hidden="true">
-              <circle cx="30" cy="30" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="5" />
-              <circle
-                cx="30" cy="30" r={r}
-                fill="none"
-                stroke={ringColor}
-                strokeWidth="5"
-                strokeLinecap="round"
-                strokeDasharray={circ}
-                strokeDashoffset={offset}
-                className="transition-all duration-700"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-base font-extrabold leading-none text-white">{used}</span>
-              <span className="text-[9px] text-gray-500 leading-none mt-0.5">/{QUOTA_MAX}</span>
-            </div>
+      {/* Brand */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '22px 22px 18px' }}>
+        <div className="brand-mark" style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(155deg, #3a3a3a 0%, #1a1a1a 55%, #0c0c0c 100%)', display: 'grid', placeItems: 'center', flexShrink: 0, position: 'relative', isolation: 'isolate', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 4px rgba(0,0,0,.10), 0 2px 4px rgba(20,18,16,.10), 0 5px 12px rgba(20,18,16,.10)' }}>
+          <MicIcon style={{ width: 20, height: 20, color: '#fff', position: 'relative', zIndex: 2, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.18))' }} />
+        </div>
+        <div>
+          <div style={{ lineHeight: 1 }}>
+            <span style={{ fontWeight: 800, fontSize: 19, letterSpacing: '-.6px', color: 'var(--ink)' }}>Acti</span>
+            <span style={{ fontWeight: 800, fontSize: 19, letterSpacing: '-.6px', color: 'var(--ac-red)' }}>Transcript</span>
+          </div>
+          <span style={{ display: 'block', marginTop: 4, fontSize: '8.5px', fontWeight: 700, letterSpacing: '1.4px', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>par Actiwork</span>
+        </div>
+      </div>
+
+      {/* Free card */}
+      <div style={{ margin: '4px 16px 20px', padding: '15px 16px', borderRadius: 'var(--r-md)', background: 'linear-gradient(160deg, var(--ac-red-wash), #fff)', border: '1px solid var(--ac-red-line)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+          <div style={{ width: 30, height: 30, borderRadius: 9, background: 'linear-gradient(155deg, #ff5a4f, var(--ac-red) 55%, var(--ac-red-dark))', color: '#fff', display: 'grid', placeItems: 'center', flexShrink: 0, boxShadow: 'var(--shadow-red)', animation: 'badge-bob 4.5s ease infinite' }}>
+            <CheckIcon style={{ width: 16, height: 16 }} />
           </div>
           <div>
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="text-xs font-bold text-white">Plan Gratuit</span>
-              <span className="text-[9px] bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded-full">FREE</span>
-            </div>
-            <p className="text-[11px] text-gray-400 leading-snug">
-              {Math.max(0, QUOTA_MAX - used)} transcription{QUOTA_MAX - used !== 1 ? 's' : ''} restante{QUOTA_MAX - used !== 1 ? 's' : ''}
-            </p>
-            <div className="flex items-center gap-1 mt-2">
-              {Array.from({ length: QUOTA_MAX }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1 rounded-full transition-all duration-500 ${
-                    i < used ? 'flex-1 bg-acti-red' : 'flex-1 bg-gray-700'
-                  }`}
-                />
-              ))}
-            </div>
+            <h4 style={{ fontSize: 13, fontWeight: 800, letterSpacing: '-.2px', color: 'var(--ink)' }}>100&nbsp;% gratuit</h4>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--ac-red-dark)', marginTop: 1 }}>Sans limite · sans compte</div>
           </div>
         </div>
-
-        {/* Upgrade button */}
-        <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-acti-blue to-blue-400 text-white text-[11px] font-bold tracking-wider py-2.5 rounded-lg hover:from-blue-600 hover:to-blue-400 transition-all duration-200 shadow-md hover:shadow-blue active:scale-[0.98] focus-ring">
-          <LightningIcon className="w-3.5 h-3.5" />
-          PASSER À ILLIMITÉ
-        </button>
+        <p style={{ fontSize: 11.5, lineHeight: 1.5, color: 'var(--ink-soft)', marginTop: 11 }}>Transcriptions illimitées, tous les formats d'export inclus. Aucune inscription requise.</p>
       </div>
 
-      {/* Navigation */}
-      <div className="px-3 py-1">
-        <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-1.5 px-2 mt-1">
-          Navigation
-        </p>
-        {[
-          { icon: HomeIcon,   label: 'Tableau de bord',  active: false, badge: null },
-          { icon: ClockIcon,  label: 'Fichiers récents', active: true,  badge: String(RECENT_FILES.length) },
-          { icon: FolderIcon, label: 'Mes dossiers',     active: false, badge: null },
-          { icon: StarIcon,   label: 'Favoris',          active: false, badge: null },
-        ].map(({ icon: Icon, label, active, badge }) => (
-          <button
-            key={label}
-            className={`flex items-center gap-2.5 text-sm w-full py-2 px-3 rounded-xl mb-0.5 transition-all duration-150
-              ${active
-                ? 'bg-acti-blue/10 text-acti-blue font-semibold'
-                : 'text-gray-500 hover:bg-gray-50 hover:text-acti-blue font-medium'
-              }`}
-          >
-            <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-acti-blue' : 'text-gray-400'}`} />
-            <span className="flex-1 text-left text-xs">{label}</span>
-            {badge && (
-              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                active ? 'bg-acti-blue text-white' : 'bg-gray-100 text-gray-500'
-              }`}>
-                {badge}
-              </span>
-            )}
-            {active && !badge && <span className="w-1.5 h-1.5 rounded-full bg-acti-blue ml-auto" />}
-          </button>
-        ))}
+      {/* Nav */}
+      <div style={{ padding: '0 16px' }}>
+        <div style={navLabelStyle}>Navigation</div>
+        <NavItem icon={<DashIcon />} label="Tableau de bord" active={false} />
+        <NavItem icon={<FileIcon />} label="Fichiers récents" active={true} badge="3" />
+        <NavItem icon={<FolderIcon />} label="Mes dossiers" active={false} />
+        <NavItem icon={<StarIcon />} label="Favoris" active={false} />
       </div>
 
-      <div className="h-px bg-gray-100 mx-3 my-2" />
-
-      {/* Recent files */}
-      <div className="px-3 flex-1 overflow-y-auto">
-        <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-1.5 px-2">
-          Récents
-        </p>
-        {RECENT_FILES.map((file, i) => (
-          <button
-            key={i}
-            className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl hover:bg-gray-50 transition-colors mb-0.5 text-left group"
-          >
-            <div className="w-7 h-7 rounded-lg bg-acti-blue/8 border border-acti-blue/10 flex items-center justify-center flex-shrink-0">
-              <AudioIcon className="w-3.5 h-3.5 text-acti-blue/70" />
+      {/* Recents */}
+      <div style={{ padding: '0 16px', flex: 1 }}>
+        <div style={navLabelStyle}>Récents</div>
+        {RECENT_FILES.map((f, i) => (
+          <div key={i} style={recentItemStyle} onMouseEnter={e => e.currentTarget.style.background='var(--bg-warm)'} onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+            <div style={recentIconStyle}>
+              <MusicIcon style={{ width: 15, height: 15, color: 'var(--ink-muted)', position: 'relative', zIndex: 2 }} />
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-semibold text-gray-700 truncate group-hover:text-acti-blue transition-colors leading-snug">
-                {file.name}
-              </p>
-              <p className="text-[10px] text-gray-400 leading-snug">
-                {file.date} · {file.duration}
-              </p>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }}>{f.name}</div>
+              <div style={{ fontSize: 10.5, color: 'var(--ink-muted)', marginTop: 1 }}>{f.time} · {f.dur}</div>
             </div>
-          </button>
-        ))}
-
-        <button className="flex items-center gap-2 text-[11px] text-acti-blue font-semibold px-2.5 py-2 hover:bg-blue-50 rounded-xl transition-colors w-full mt-1">
-          <PlusIcon className="w-3.5 h-3.5" />
-          Nouveau dossier
-        </button>
-      </div>
-
-      {/* Status footer */}
-      <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-            </span>
-            <span className="text-[10px] text-gray-400 font-medium">Whisper AI · En ligne</span>
           </div>
-          <button className="text-[10px] text-gray-300 hover:text-gray-500 transition-colors">
-            <SettingsIcon className="w-3.5 h-3.5" />
-          </button>
+        ))}
+        <div style={recentItemStyle} onMouseEnter={e => e.currentTarget.style.background='var(--bg-warm)'} onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+          <div style={{ ...recentIconStyle, background: 'var(--ac-red-wash)', borderColor: 'var(--ac-red-line)', color: 'var(--ac-red)' }}>
+            <PlusIcon style={{ width: 15, height: 15, position: 'relative', zIndex: 2 }} />
+          </div>
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)' }}>Nouveau dossier</div>
         </div>
       </div>
+
+      {/* Footer */}
+      <div style={{ marginTop: 'auto', padding: '14px 22px', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, fontSize: 11.5, color: 'var(--ink-muted)', fontWeight: 600 }}>
+        <span className="live-dot" style={{ width: 7, height: 7, borderRadius: 99, background: '#22a06b', display: 'inline-block' }} />
+        Transcription locale · En ligne
+      </div>
+    </aside>
+  )
+}
+
+function NavItem({ icon, label, active, badge }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '9px 11px', borderRadius: 'var(--r)', fontSize: 13.5, fontWeight: active ? 700 : 600, color: active ? 'var(--ac-red-deep)' : 'var(--ink-soft)', background: active ? 'var(--ac-red-tint)' : 'transparent', cursor: 'pointer', marginBottom: 2 }}>
+      <span style={{ color: active ? 'var(--ac-red)' : 'var(--ink-muted)', display: 'flex' }}>{icon}</span>
+      <span style={{ flex: 1 }}>{label}</span>
+      {badge && <span style={{ fontSize: 10.5, fontWeight: 800, background: active ? 'var(--ac-red)' : 'var(--ink)', color: '#fff', minWidth: 19, height: 19, padding: '0 5px', borderRadius: 99, display: 'grid', placeItems: 'center' }}>{badge}</span>}
     </div>
   )
 }
 
-/* ── Icons ── */
-function HomeIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-}
-function ClockIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="1.5" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6l4 2" /></svg>
-}
-function FolderIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" /></svg>
-}
-function StarIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>
-}
-function AudioIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
-}
-function LightningIcon({ className }) {
-  return <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-}
-function PlusIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-}
-function SettingsIcon({ className }) {
-  return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-}
+const navLabelStyle = { fontSize: 10, fontWeight: 800, letterSpacing: '1.4px', textTransform: 'uppercase', color: 'var(--ink-faint)', padding: '16px 8px 9px' }
+const recentItemStyle = { display: 'flex', alignItems: 'center', gap: 11, padding: '9px 11px', borderRadius: 'var(--r)', cursor: 'pointer', transition: 'background .18s' }
+const recentIconStyle = { width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: 'linear-gradient(160deg, #ffffff 0%, #f1efeb 100%)', border: '1px solid var(--border)', display: 'grid', placeItems: 'center', position: 'relative', isolation: 'isolate', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.9), inset 0 -2px 3px rgba(0,0,0,.05), 0 2px 5px rgba(20,18,16,.08)' }
+
+function MicIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg> }
+function CheckIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg> }
+function DashIcon() { return <svg style={{ width: 17, height: 17 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg> }
+function FileIcon() { return <svg style={{ width: 17, height: 17 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg> }
+function FolderIcon() { return <svg style={{ width: 17, height: 17 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> }
+function StarIcon() { return <svg style={{ width: 17, height: 17 }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> }
+function MusicIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> }
+function PlusIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> }

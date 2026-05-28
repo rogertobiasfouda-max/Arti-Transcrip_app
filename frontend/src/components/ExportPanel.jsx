@@ -35,181 +35,108 @@ export default function ExportPanel({ transcript }) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <aside style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--card)', borderLeft: '1px solid var(--border)' }}>
 
-      {/* Panel header */}
-      <div className="px-4 pt-4 pb-3 border-b border-gray-100">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-acti-blue/10 flex items-center justify-center">
-            <ExportIcon className="w-3.5 h-3.5 text-acti-blue" />
+      {/* Header */}
+      <div style={{ padding: '18px 18px 14px', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--ac-red-wash)', border: '1px solid var(--ac-red-line)', display: 'grid', placeItems: 'center' }}>
+            <ExportIcon style={{ width: 15, height: 15, color: 'var(--ac-red)' }} />
           </div>
-          <h3 className="text-xs font-bold text-gray-700 uppercase tracking-widest">Exporter</h3>
+          <h3 style={{ fontSize: 11, fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'var(--ink-faint)' }}>Exporter</h3>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '14px 14px 0' }}>
 
-        {/* Export formats */}
+        {/* Formats */}
         <SectionLabel label="Format de fichier" />
-        <div className="space-y-0.5 mb-4">
-          <ExportRow
-            icon={<PDFIcon className="w-4 h-4 text-red-500" />}
-            iconBg="bg-red-50"
-            label="PDF"
-            sublabel="Document formaté"
-            badge="PRO"
-            disabled
-          />
-          <ExportRow
-            icon={<DocIcon className="w-4 h-4 text-blue-600" />}
-            iconBg="bg-blue-50"
-            label="Word (DOCX)"
-            sublabel="Microsoft Word"
-            badge="PRO"
-            disabled
-          />
-          <ExportRow
-            icon={<TxtIcon className="w-4 h-4 text-gray-500" />}
-            iconBg="bg-gray-100"
-            label="Texte brut (TXT)"
-            sublabel="Avec horodatages"
-            disabled={!has}
-            onClick={() => dl('txt', 'txt')}
-          />
-          <ExportRow
-            icon={<SrtIcon className="w-4 h-4 text-purple-600" />}
-            iconBg="bg-purple-50"
-            label="Sous-titres (SRT)"
-            sublabel="Format standard"
-            disabled={!has}
-            onClick={() => dl('srt', 'srt')}
-          />
+        <div style={{ marginBottom: 16 }}>
+          <ExportRow icon={<PDFIcon />} color="#ef4444" bg="#fef2f2" label="PDF" sublabel="Document formaté" gratuit disabled={!has} onClick={() => dl('pdf', 'pdf')} />
+          <ExportRow icon={<DocIcon />} color="#3b82f6" bg="#eff6ff" label="Word (DOCX)" sublabel="Microsoft Word" gratuit disabled={!has} onClick={() => dl('docx', 'docx')} />
+          <ExportRow icon={<TxtIcon />} color="var(--ink-muted)" bg="var(--bg-warm)" label="Texte brut (TXT)" sublabel="Avec horodatages" gratuit disabled={!has} onClick={() => dl('txt', 'txt')} />
+          <ExportRow icon={<SrtIcon />} color="#8b5cf6" bg="#f5f3ff" label="Sous-titres (SRT)" sublabel="Format standard" gratuit disabled={!has} onClick={() => dl('srt', 'srt')} />
+          <ExportRow icon={<Mp3Icon />} color="#f59e0b" bg="#fffbeb" label="Audio (MP3)" sublabel="Fichier original" gratuit disabled={!has} onClick={() => dl('mp3', 'mp3')} />
         </div>
 
-        <div className="h-px bg-gray-100 my-3" />
+        <div style={{ height: 1, background: 'var(--border)', margin: '0 0 14px' }} />
 
         {/* Actions */}
         <SectionLabel label="Actions" />
-        <div className="space-y-0.5">
+        <div style={{ marginBottom: 14 }}>
           <ExportRow
-            icon={copied
-              ? <CheckIcon className="w-4 h-4 text-green-600" />
-              : <CopyIcon className="w-4 h-4 text-gray-500" />
-            }
-            iconBg={copied ? 'bg-green-50' : 'bg-gray-100'}
+            icon={copied ? <CheckIcon style={{ color: '#16a34a' }} /> : <CopyIcon />}
+            color={copied ? '#16a34a' : 'var(--ink-muted)'}
+            bg={copied ? '#f0fdf4' : 'var(--bg-warm)'}
             label={copied ? 'Copié !' : 'Copier le texte'}
             sublabel="Vers le presse-papier"
             disabled={!has}
             onClick={handleCopy}
             success={copied}
           />
-          <ExportRow
-            icon={<MdIcon className="w-4 h-4 text-green-600" />}
-            iconBg="bg-green-50"
-            label="Markdown (.md)"
-            sublabel="Format structuré"
-            disabled={!has}
-            onClick={() => dl('md', 'md')}
-          />
-          <ExportRow
-            icon={<ShareIcon className="w-4 h-4 text-indigo-500" />}
-            iconBg="bg-indigo-50"
-            label="Partager"
-            sublabel="Bientôt disponible"
-            badge="SOON"
-            disabled
-          />
-          <ExportRow
-            icon={<EditIcon className="w-4 h-4 text-amber-500" />}
-            iconBg="bg-amber-50"
-            label="Renommer"
-            sublabel="Bientôt disponible"
-            badge="SOON"
-            disabled
-          />
+          <ExportRow icon={<MdIcon />} color="#16a34a" bg="#f0fdf4" label="Markdown (.md)" sublabel="Format structuré" gratuit disabled={!has} onClick={() => dl('md', 'md')} />
         </div>
       </div>
 
-      {/* Stats / locked */}
-      <div className="p-3 border-t border-gray-100">
+      {/* Stats footer */}
+      <div style={{ padding: 14, borderTop: '1px solid var(--border)' }}>
         {has ? (
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-xl p-3 border border-gray-100">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2.5">
-              Statistiques
-            </p>
-            <div className="space-y-2">
-              <StatRow
-                icon={<SegmentsIcon className="w-3 h-3 text-acti-blue" />}
-                label="Segments"
-                value={transcript.segments.length}
-              />
-              <StatRow
-                icon={<ClockIcon className="w-3 h-3 text-purple-500" />}
-                label="Durée"
-                value={formatDuration(transcript.segments.at(-1)?.end ?? 0)}
-              />
-              <StatRow
-                icon={<WordIcon className="w-3 h-3 text-green-500" />}
-                label="Mots (approx.)"
-                value={countWords(transcript.exports?.txt || '').toLocaleString()}
-              />
+          <div style={{ background: 'linear-gradient(160deg, var(--ac-red-wash), var(--bg-warm))', border: '1px solid var(--ac-red-line)', borderRadius: 'var(--r-md)', padding: '12px 14px' }}>
+            <p style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'var(--ink-faint)', marginBottom: 10 }}>Statistiques</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <StatRow icon={<SegIcon />} label="Segments" value={transcript.segments.length} />
+              <StatRow icon={<ClockIcon />} label="Durée" value={formatDuration(transcript.segments.at(-1)?.end ?? 0)} />
+              <StatRow icon={<WordIcon />} label="Mots (approx.)" value={countWords(transcript.exports?.txt || '').toLocaleString()} />
             </div>
           </div>
         ) : (
-          <div className="bg-gray-50 rounded-xl p-4 text-center border border-gray-100">
-            <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center mx-auto mb-2">
-              <LockIcon className="w-4.5 h-4.5 text-gray-400" />
+          <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '16px 14px', textAlign: 'center' }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-warm)', border: '1px solid var(--border)', display: 'grid', placeItems: 'center', margin: '0 auto 8px' }}>
+              <LockIcon />
             </div>
-            <p className="text-[11px] text-gray-400 font-medium leading-snug">
-              Actions disponibles<br />après transcription
-            </p>
+            <p style={{ fontSize: 11, color: 'var(--ink-muted)', fontWeight: 600, lineHeight: 1.5 }}>Actions disponibles<br />après transcription</p>
           </div>
         )}
       </div>
-    </div>
+    </aside>
   )
 }
 
 function SectionLabel({ label }) {
-  return (
-    <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-2 px-1">
-      {label}
-    </p>
-  )
+  return <p style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'var(--ink-faint)', padding: '0 6px 8px' }}>{label}</p>
 }
 
-function ExportRow({ icon, iconBg, label, sublabel, badge, disabled, onClick, success }) {
+function ExportRow({ icon, color, bg, label, sublabel, gratuit, disabled, onClick, success }) {
+  const [hov, setHov] = useState(false)
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
-      className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl text-left transition-all duration-150
-        ${disabled
-          ? 'opacity-40 cursor-not-allowed'
-          : success
-            ? 'bg-green-50 cursor-pointer'
-            : 'hover:bg-gray-50 cursor-pointer hover:shadow-sm active:scale-[0.98]'
-        }`}
+      disabled={disabled && !success}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+        padding: '9px 8px', borderRadius: 'var(--r)', border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+        background: hov && !disabled ? 'var(--bg-warm)' : 'transparent',
+        opacity: disabled ? 0.4 : 1,
+        transition: 'background .15s, opacity .15s',
+        marginBottom: 2, textAlign: 'left',
+      }}
     >
-      <div className={`w-7 h-7 rounded-lg ${iconBg} flex items-center justify-center flex-shrink-0`}>
+      <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'grid', placeItems: 'center', flexShrink: 0, color }}>
         {icon}
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold text-gray-700 truncate leading-snug">{label}</p>
-        {sublabel && <p className="text-[10px] text-gray-400 leading-snug">{sublabel}</p>}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink)', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+        {sublabel && <div style={{ fontSize: 10.5, color: 'var(--ink-muted)', marginTop: 1 }}>{sublabel}</div>}
       </div>
-      {badge === 'PRO' && (
-        <span className="text-[9px] font-bold bg-gradient-to-r from-amber-400 to-orange-400 text-white px-1.5 py-0.5 rounded-full flex-shrink-0">
-          PRO
+      {gratuit && (
+        <span style={{ fontSize: 9, fontWeight: 800, background: '#dcfce7', color: '#16a34a', padding: '2px 6px', borderRadius: 99, flexShrink: 0, letterSpacing: '.3px' }}>
+          Gratuit
         </span>
       )}
-      {badge === 'SOON' && (
-        <span className="text-[9px] font-bold bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full flex-shrink-0">
-          SOON
-        </span>
-      )}
-      {!disabled && !badge && (
-        <DownloadIcon className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+      {!disabled && !gratuit && (
+        <DownloadIcon style={{ color: 'var(--ink-faint)', flexShrink: 0 }} />
       )}
     </button>
   )
@@ -217,29 +144,28 @@ function ExportRow({ icon, iconBg, label, sublabel, badge, disabled, onClick, su
 
 function StatRow({ icon, label, value }) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-1.5">
-        {icon}
-        <span className="text-[11px] text-gray-500">{label}</span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ color: 'var(--ac-red)', display: 'flex' }}>{icon}</span>
+        <span style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{label}</span>
       </div>
-      <span className="text-[11px] font-bold text-gray-700">{value}</span>
+      <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--ink)' }}>{value}</span>
     </div>
   )
 }
 
-/* ── Icons ── */
-function ExportIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> }
-function PDFIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg> }
-function DocIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> }
-function TxtIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h10M4 18h6" /></svg> }
-function SrtIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" strokeWidth={1.5} /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 9l3.5 3L7 15M13 15h4" /></svg> }
-function CopyIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> }
-function MdIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg> }
-function ShareIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg> }
-function EditIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg> }
-function DownloadIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> }
-function CheckIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg> }
-function LockIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg> }
-function SegmentsIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 10h16M4 14h8" /></svg> }
-function ClockIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="1.5" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6v6l4 2" /></svg> }
-function WordIcon({ className }) { return <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg> }
+/* Icons */
+function ExportIcon({ style }) { return <svg style={{ width: 15, height: 15, ...style }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> }
+function PDFIcon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/></svg> }
+function DocIcon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg> }
+function TxtIcon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="14" y2="14"/><line x1="4" y1="18" x2="10" y2="18"/></svg> }
+function SrtIcon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 9l3.5 3L7 15M13 15h4"/></svg> }
+function Mp3Icon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg> }
+function CopyIcon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> }
+function MdIcon() { return <svg style={{ width: 15, height: 15 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/></svg> }
+function CheckIcon({ style }) { return <svg style={{ width: 15, height: 15, ...style }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg> }
+function DownloadIcon({ style }) { return <svg style={{ width: 14, height: 14, ...style }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> }
+function LockIcon() { return <svg style={{ width: 16, height: 16, color: 'var(--ink-faint)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> }
+function SegIcon() { return <svg style={{ width: 13, height: 13 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="4" y1="14" x2="12" y2="14"/></svg> }
+function ClockIcon() { return <svg style={{ width: 13, height: 13 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> }
+function WordIcon() { return <svg style={{ width: 13, height: 13 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg> }

@@ -10,11 +10,8 @@ RUN npm run build
 FROM python:3.11-slim
 WORKDIR /app
 
-# ffmpeg requis par pydub pour les fichiers > 25 Mo
-RUN apt-get update -o Acquire::Retries=3 && \
-    apt-get install -y --no-install-recommends ffmpeg && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# ffmpeg : binary statique (évite apt-get et ses timeouts réseau)
+COPY --from=mwader/static-ffmpeg:latest /ffmpeg /usr/local/bin/ffmpeg
 
 # Dépendances Python
 COPY backend/requirements.txt .

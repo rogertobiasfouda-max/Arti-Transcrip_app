@@ -12,19 +12,17 @@ function buildBarHeights() {
 }
 const BAR_HEIGHTS = buildBarHeights()
 
-// ── Audio Player ────────────────────────────────────────────────────────────
-function AudioPlayer({ segments }) {
-  const DURATION = segments.at(-1)?.end ?? 720
+// ── Audio Player (vrai lecteur HTML5) ───────────────────────────────────────
+function AudioPlayer({ segments, audioUrl }) {
   const RATES = [1, 1.25, 1.5, 2]
-  const [cur, setCur]         = useState(0)
+  const audioRef           = useRef(null)
+  const [cur, setCur]      = useState(0)
+  const [duration, setDur] = useState(segments.at(-1)?.end ?? 0)
   const [playing, setPlaying] = useState(false)
-  const [rate, setRate]       = useState(1)
-  const [follow, setFollow]   = useState(true)
-  const rafRef                = useRef(null)
-  const lastTickRef           = useRef(0)
-  const curRef                = useRef(0)
+  const [rate, setRate]    = useState(1)
+  const [follow, setFollow] = useState(true)
 
-  const fmt = (s) => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}` }
+  const fmt = (s) => { s = Math.max(0, Math.floor(s || 0)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}` }
 
   const activeIdx = (t) => {
     let idx = 0
@@ -32,82 +30,87 @@ function AudioPlayer({ segments }) {
     return idx
   }
 
-  const seekTo = useCallback((t) => {
-    const clamped = Math.max(0, Math.min(DURATION, t))
-    curRef.current = clamped
-    setCur(clamped)
-  }, [DURATION])
+  // Sync rate
+  useEffect(() => { if (audioRef.current) audioRef.current.playbackRate = rate }, [rate])
 
-  const loop = useCallback(() => {
-    const now = performance.now()
-    const dt  = (now - lastTickRef.current) / 1000
-    lastTickRef.current = now
-    curRef.current = Math.min(DURATION, curRef.current + dt * rate)
-    setCur(curRef.current)
-    if (curRef.current >= DURATION) { setPlaying(false); return }
-    rafRef.current = requestAnimationFrame(loop)
-  }, [DURATION, rate])
+  const togglePlay = () => {
+    const a = audioRef.current
+    if (!a) return
+    if (playing) { a.pause(); setPlaying(false) }
+    else { a.play().then(() => setPlaying(true)).catch(() => {}) }
+  }
 
-  useEffect(() => {
-    if (playing) { lastTickRef.current = performance.now(); rafRef.current = requestAnimationFrame(loop) }
-    else if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [playing, loop])
+  const seekTo = (t) => {
+    const a = audioRef.current
+    if (!a) return
+    a.currentTime = Math.max(0, Math.min(duration || 9999, t))
+  }
 
-  const pct    = cur / DURATION
-  const filled = Math.round(pct * BARS)
+  const filled = Math.round((cur / (duration || 1)) * BARS)
   const ai     = activeIdx(cur)
-  const nowTxt = segments[ai]?.text?.slice(0, 55) + '…' || ''
-  const fmtDur = () => { const m = Math.floor(DURATION/60); return `${m}:${String(Math.round(DURATION%60)).padStart(2,'0')}` }
+  const nowTxt = (segments[ai]?.text || '').slice(0, 55) + (segments[ai]?.text?.length > 55 ? '…' : '')
 
   return (
     <div style={{ marginTop: 16, background: 'var(--ink)', borderRadius: 'var(--r-lg)', padding: '16px 20px 18px', boxShadow: 'var(--shadow-lg)', color: '#fff', position: 'sticky', top: 0, zIndex: 20 }}>
+
+      {/* Élément audio caché — c'est lui qui joue vraiment */}
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        onTimeUpdate={e => setCur(e.target.currentTime)}
+        onDurationChange={e => setDur(e.target.duration)}
+        onEnded={() => setPlaying(false)}
+        onPause={() => setPlaying(false)}
+        onPlay={() => setPlaying(true)}
+        style={{ display: 'none' }}
+      />
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* -10 */}
+        {/* -10s */}
         <button onClick={() => seekTo(cur - 10)} style={skipStyle} title="-10s">
           <SkipBackIcon style={{ width: 16, height: 16 }} /><span style={{ position: 'absolute', fontSize: 7, fontWeight: 800, bottom: 7 }}>10</span>
         </button>
 
-        {/* Play */}
+        {/* Play/Pause */}
         <button
-          onClick={() => setPlaying(p => !p)}
+          onClick={togglePlay}
           style={{ width: 50, height: 50, borderRadius: '50%', flexShrink: 0, background: 'radial-gradient(120% 90% at 32% 18%, rgba(255,255,255,.45), rgba(255,255,255,0) 50%), linear-gradient(160deg, #ff5a4f 0%, var(--ac-red) 50%, var(--ac-red-dark) 100%)', border: 'none', color: '#fff', cursor: 'pointer', display: 'grid', placeItems: 'center', boxShadow: 'inset 0 2px 2px rgba(255,255,255,.4), inset 0 -3px 6px rgba(0,0,0,.25), var(--shadow-red)', position: 'relative' }}
-          title="Lecture / Pause"
+          title={audioUrl ? 'Lecture / Pause' : 'Audio non disponible'}
         >
           {playing ? <PauseIcon style={{ width: 22, height: 22 }} /> : <PlayIcon style={{ width: 22, height: 22 }} />}
           {playing && <span style={{ position: 'absolute', inset: -6, borderRadius: '50%', border: '2px solid var(--ac-red)', animation: 'pulse-ring 1.6s ease infinite', pointerEvents: 'none' }} />}
         </button>
 
-        {/* +10 */}
+        {/* +10s */}
         <button onClick={() => seekTo(cur + 10)} style={skipStyle} title="+10s">
           <SkipFwdIcon style={{ width: 16, height: 16 }} /><span style={{ position: 'absolute', fontSize: 7, fontWeight: 800, bottom: 7 }}>10</span>
         </button>
 
-        {/* Waveform */}
+        {/* Waveform cliquable */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div
-            onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); seekTo((e.clientX - r.left) / r.width * DURATION) }}
+            onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); seekTo((e.clientX - r.left) / r.width * (duration || 0)) }}
             style={{ position: 'relative', height: 46, width: '100%', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}
           >
             {BAR_HEIGHTS.map((h, i) => (
-              <div key={i} style={{ flex: 1, borderRadius: 2, minWidth: 2, height: `${h * 100}%`, background: i < filled ? 'var(--ac-red)' : i === filled ? '#fff' : 'rgba(255,255,255,.22)', transition: 'background .12s' }} />
+              <div key={i} style={{ flex: 1, borderRadius: 2, minWidth: 2, height: `${h * 100}%`, background: i < filled ? 'var(--ac-red)' : i === filled ? '#fff' : 'rgba(255,255,255,.22)', transition: 'background .08s' }} />
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, fontSize: 11.5, fontVariantNumeric: 'tabular-nums', color: 'rgba(255,255,255,.62)', fontWeight: 600 }}>
-            <span><span style={{ color: '#fff' }}>{fmt(cur)}</span> / {fmtDur()}</span>
+            <span><span style={{ color: '#fff' }}>{fmt(cur)}</span> / {fmt(duration)}</span>
             <span style={{ fontSize: 11, color: 'rgba(255,255,255,.5)', maxWidth: 320, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{nowTxt}</span>
           </div>
         </div>
 
-        {/* Follow toggle */}
-        <div onClick={() => setFollow(f => !f)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, flexShrink: 0, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.7)', cursor: 'pointer', userSelect: 'none' }} title="Suivre la lecture">
+        {/* Suivre */}
+        <div onClick={() => setFollow(f => !f)} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, flexShrink: 0, fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,.7)', cursor: 'pointer', userSelect: 'none' }}>
           <div style={{ width: 30, height: 17, borderRadius: 99, background: follow ? 'var(--ac-red)' : 'rgba(255,255,255,.18)', position: 'relative', transition: 'background .2s' }}>
             <span style={{ position: 'absolute', top: 2, left: 2, width: 13, height: 13, borderRadius: '50%', background: '#fff', transition: 'transform .2s', transform: follow ? 'translateX(13px)' : 'none', display: 'block' }} />
           </div>
           Suivre
         </div>
 
-        {/* Rate */}
+        {/* Vitesse */}
         <button onClick={() => setRate(r => RATES[(RATES.indexOf(r) + 1) % RATES.length])} style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.12)', color: '#fff', fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums', padding: '8px 12px', borderRadius: 'var(--r)', cursor: 'pointer', flexShrink: 0, minWidth: 52 }}>
           {rate}×
         </button>
@@ -153,7 +156,7 @@ function fmt(s) { s = Math.max(0,Math.floor(s)); return `(${Math.floor(s/60)}:${
 const TABS = ['resume','points','actions','objections','email']
 const TAB_LABELS = { resume:'Résumé', points:'Points clés', actions:'Prochaines étapes', objections:'Objections & signaux', email:'E-mail de suivi' }
 
-function SalesAssistant({ transcript }) {
+function SalesAssistant({ transcript, audioUrl }) {
   const [tab, setTab] = useState('resume')
   const [toast, setToast] = useState(null)
 
@@ -188,7 +191,7 @@ function SalesAssistant({ transcript }) {
           <Chip icon={<ClockIcon />} text={<>Durée <b>{duration}</b></>} />
           <Chip icon={<TextIcon />} text={<>≈ <b>{wordCount.toLocaleString()}</b> mots</>} />
         </div>
-        <AudioPlayer segments={transcript.segments} />
+        <AudioPlayer segments={transcript.segments} audioUrl={audioUrl} />
       </div>
 
       {/* TOOLBAR */}
@@ -445,10 +448,10 @@ function Chip({ icon, text }) {
 }
 
 // ── Main export ─────────────────────────────────────────────────────────────
-export default function TranscriptView({ transcript, showTimestamps, onToggleTimestamps, onReset }) {
+export default function TranscriptView({ transcript, audioUrl, showTimestamps, onToggleTimestamps, onReset }) {
   return (
     <div style={{ maxWidth: 880, margin: '0 auto' }} className="animate-fade-in-up">
-      <SalesAssistant transcript={transcript} />
+      <SalesAssistant transcript={transcript} audioUrl={audioUrl} />
       <div style={{ height: 60 }} />
     </div>
   )

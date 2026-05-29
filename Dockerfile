@@ -15,6 +15,10 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pré-télécharger le binaire ffmpeg (imageio-ffmpeg le télécharge au 1er appel)
+# On force le téléchargement maintenant pendant le build pour éviter les délais à runtime
+RUN python -c "import imageio_ffmpeg; print('ffmpeg path:', imageio_ffmpeg.get_ffmpeg_exe())"
+
 # Code backend
 COPY backend/ .
 

@@ -31,7 +31,8 @@ app.add_middleware(
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-MAX_CHUNK_BYTES = 24 * 1024 * 1024  # 24 MB
+MAX_CHUNK_BYTES = 24 * 1024 * 1024   # 24 MB — limite Whisper API
+MAX_UPLOAD_BYTES = 200 * 1024 * 1024  # 200 MB — limite upload acceptée
 
 MOIS = [
     "janvier", "février", "mars", "avril", "mai", "juin",
@@ -61,17 +62,25 @@ def split_audio_if_needed(path: str, file_size: int) -> List[dict]:
     if file_size <= MAX_CHUNK_BYTES:
         return [{"path": path, "offset": 0.0, "temp": False}]
 
+    import pydub
+
+    # S'assurer que pydub utilise le bon ffmpeg (imageio-ffmpeg)
     try:
-        import pydub
-    except ImportError:
-        raise HTTPException(500, "pydub non installé — impossible de découper le fichier volumineux.")
+        import imageio_ffmpeg
+        ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        pydub.AudioSegment.converter = ffmpeg_exe
+        pydub.AudioSegment.ffmpeg    = ffmpeg_exe
+        print(f"[split] Using ffmpeg: {ffmpeg_exe}")
+    except Exception as e:
+        print(f"[split] imageio_ffmpeg unavailable: {e}")
 
     try:
         audio = pydub.AudioSegment.from_file(path)
     except Exception as exc:
         raise HTTPException(
-            400,
-            f"Impossible de lire le fichier audio. ffmpeg est-il installé ? ({exc})",
+            422,
+            f"Impossible de lire/découper ce fichier audio ({len(path)} o). "
+            f"Vérifiez que le format est supporté. Détail : {exc}",
         )
 
     duration_ms = len(audio)
@@ -164,6 +173,14 @@ async def transcribe_audio(file: UploadFile = File(...)):
         )
 
     content = await file.read()
+
+    # Vérification taille
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            413,
+            f"Fichier trop volumineux ({len(content) // (1024*1024)} Mo). "
+            f"Limite : {MAX_UPLOAD_BYTES // (1024*1024)} Mo."
+        )
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=ext or ".mp3") as tmp:
         tmp.write(content)

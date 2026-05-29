@@ -245,37 +245,57 @@ function SalesAssistant({ transcript, audioUrl }) {
       </section>
 
       {/* ANALYSER DANS CLAUDE */}
-      <section style={{ marginTop: 18, position: 'relative', overflow: 'hidden', background: 'linear-gradient(160deg, #1f1d1b 0%, #14110f 100%)', border: '1px solid #2e2a27', borderRadius: 'var(--r-lg)', padding: '24px 26px', boxShadow: 'var(--shadow-lg)', color: '#fff' }}>
-        <div style={{ position: 'absolute', top: -60, right: -40, width: 240, height: 240, background: 'radial-gradient(circle, rgba(217,119,87,.5), rgba(217,119,87,0) 70%)', pointerEvents: 'none' }} />
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, position: 'relative' }}>
-          <div style={{ width: 42, height: 42, borderRadius: 12, flexShrink: 0, background: 'linear-gradient(155deg, #e08a63, #d97757 55%, #b85d40)', color: '#fff', display: 'grid', placeItems: 'center', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.4), 0 6px 18px rgba(217,119,87,.45)' }}>
-            <LightbulbIcon style={{ width: 22, height: 22, filter: 'drop-shadow(0 1px 1px rgba(0,0,0,.3))' }} />
+      <section style={{ marginTop: 18, background: 'linear-gradient(160deg, #1a1816 0%, #111009 100%)', border: '1px solid #2a2520', borderRadius: 'var(--r-lg)', padding: '24px 26px', boxShadow: 'var(--shadow-lg)', color: '#fff' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+          {/* Logo Claude */}
+          <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: 'linear-gradient(155deg, #c96442 0%, #b5451e 55%, #8f3315 100%)', display: 'grid', placeItems: 'center', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.25), 0 6px 20px rgba(185,80,35,.5)' }}>
+            <ClaudeIcon />
           </div>
-          <div>
-            <h3 style={{ fontSize: 16.5, fontWeight: 800, letterSpacing: '-.3px' }}>Analyser cette transcription dans Claude</h3>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.6)', marginTop: 4, lineHeight: 1.5, maxWidth: 540 }}>Copiez le texte et collez-le dans Claude : il accède à l'intégralité du contenu de la transcription.</p>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <h3 style={{ fontSize: 16.5, fontWeight: 800, letterSpacing: '-.3px' }}>Analyser dans Claude</h3>
+              <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '.8px', textTransform: 'uppercase', color: '#c96442', background: 'rgba(201,100,66,.15)', border: '1px solid rgba(201,100,66,.3)', padding: '3px 8px', borderRadius: 99 }}>claude.ai</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.5)', marginTop: 5, lineHeight: 1.55 }}>
+              Copiez la transcription complète et collez-la dans Claude pour obtenir résumé, analyse et suivi.
+            </p>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginTop: 18, position: 'relative', background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 'var(--r)', padding: '7px 7px 7px 14px' }}>
-          <LinkIcon style={{ width: 17, height: 17, color: 'rgba(255,255,255,.5)', flexShrink: 0 }} />
-          <input type="text" readOnly value={`https://actitranscript.app/t/${transcript.title?.slice(0,8) || 'demo'}?s=9f2c7e`} style={{ flex: 1, minWidth: 0, background: 'none', border: 'none', outline: 'none', fontFamily: 'var(--mono)', fontSize: 13, color: 'rgba(255,255,255,.92)' }} />
-          <button onClick={() => { navigator.clipboard.writeText(`https://actitranscript.app/t/${transcript.title?.slice(0,8)}`).catch(()=>{}); showToast('Lien copié — collez-le dans Claude') }} style={{ flexShrink: 0, fontFamily: 'var(--font)', fontSize: 12.5, fontWeight: 700, color: '#fff', background: 'var(--ac-red)', border: 'none', borderRadius: 7, padding: '9px 16px', cursor: 'pointer', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.3), var(--shadow-red)' }}>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,.07)', margin: '20px 0' }} />
+
+        {/* Bouton principal — copier pour Claude */}
+        <button
+          onClick={() => {
+            const body = transcript.segments.map(s => `[${fmt(s.start)}] ${s.text}`).join('\n')
+            const prompt = `Voici la transcription complète et horodatée d'un entretien commercial (généré par Acti Transcript).\nAnalyse-la et propose :\n1. Un résumé exécutif\n2. Les points clés\n3. Les prochaines étapes\n4. Un e-mail de suivi\n\n=== TRANSCRIPTION ===\n${body}`
+            navigator.clipboard.writeText(prompt).catch(() => {})
+            showToast('Transcription + prompt copiés — collez dans Claude !')
+          }}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'linear-gradient(160deg, #c96442, #b5451e 60%, #8f3315)', border: 'none', borderRadius: 'var(--r-md)', padding: '14px 20px', cursor: 'pointer', color: '#fff', boxShadow: 'inset 0 1px 0 rgba(255,255,255,.2), 0 6px 20px rgba(185,80,35,.4)', textAlign: 'left' }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '.9'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >
+          <ClaudeIcon size={20} />
+          <div>
+            <div style={{ fontSize: 13.5, fontWeight: 800, letterSpacing: '-.2px' }}>Copier le texte pour Claude</div>
+            <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,.65)', marginTop: 2 }}>Prompt + transcription complète horodatée · prêt à coller</div>
+          </div>
+          <CopyIcon style={{ width: 16, height: 16, marginLeft: 'auto', color: 'rgba(255,255,255,.6)' }} />
+        </button>
+
+        {/* Lien direct */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 'var(--r)', padding: '8px 8px 8px 14px' }}>
+          <LinkIcon style={{ width: 15, height: 15, color: 'rgba(255,255,255,.4)', flexShrink: 0 }} />
+          <span style={{ flex: 1, fontFamily: 'var(--mono)', fontSize: 12, color: 'rgba(255,255,255,.6)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {`https://actitranscript.app/t/${transcript.title?.slice(0, 12) || 'demo'}`}
+          </span>
+          <button onClick={() => { navigator.clipboard.writeText(`https://actitranscript.app/t/${transcript.title?.slice(0,12)}`).catch(() => {}); showToast('Lien copié') }} style={{ flexShrink: 0, fontFamily: 'var(--font)', fontSize: 11.5, fontWeight: 700, color: 'rgba(255,255,255,.7)', background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '6px 12px', cursor: 'pointer' }}>
             Copier le lien
           </button>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 14, flexWrap: 'wrap', position: 'relative' }}>
-          <button
-            onClick={() => {
-              const body = transcript.segments.map(s => `[${fmt(s.start)}] ${s.text}`).join('\n')
-              const prompt = `Voici la transcription complète et horodatée d'un entretien (Acti Transcript). Analyse-la et propose un résumé, les points clés, les prochaines étapes et un e-mail de suivi.\n\n=== TRANSCRIPTION ===\n${body}`
-              navigator.clipboard.writeText(prompt).catch(()=>{})
-              showToast('Texte + prompt copiés pour Claude')
-            }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font)', fontSize: 12.5, fontWeight: 700, color: 'rgba(255,255,255,.9)', background: 'rgba(255,255,255,.07)', border: '1px solid rgba(255,255,255,.14)', borderRadius: 'var(--r)', padding: '9px 15px', cursor: 'pointer' }}
-          >
-            <LockIcon style={{ width: 15, height: 15 }} /> Copier le texte pour Claude
-          </button>
-          <span style={{ fontSize: 11.5, color: 'rgba(255,255,255,.4)' }}>Inclut le prompt + la transcription complète horodatée</span>
         </div>
       </section>
 
@@ -472,3 +492,12 @@ function ChartIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fi
 function LightbulbIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0-6 6c0 2 1 3 1 5a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3c0-2 1-3 1-5a6 6 0 0 0-6-6Z"/><path d="M9 21h6"/></svg> }
 function LinkIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> }
 function LockIcon({ style }) { return <svg style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="11" rx="2"/></svg> }
+
+/* Icône Claude — forme Anthropic (silhouette stylisée) */
+function ClaudeIcon({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 41 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M23.665 5.144L13.133 35.856h5.175l2.118-6.427h10.637l2.118 6.427h5.175L27.824 5.144h-4.16zm-.84 19.797l3.92-11.89 3.92 11.89h-7.84z" fill="white"/>
+    </svg>
+  )
+}

@@ -8,6 +8,16 @@ function downloadBlob(content, filename, type = 'text/plain') {
   URL.revokeObjectURL(url)
 }
 
+function downloadBase64(b64, filename, mimeType) {
+  if (!b64) return
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0))
+  const blob  = new Blob([bytes], { type: mimeType })
+  const url   = URL.createObjectURL(blob)
+  const a     = document.createElement('a')
+  a.href = url; a.download = filename; a.click()
+  URL.revokeObjectURL(url)
+}
+
 function formatDuration(sec) {
   const s = Math.round(sec)
   if (s < 60)   return `${s}s`
@@ -52,8 +62,8 @@ export default function ExportPanel({ transcript }) {
         {/* Formats */}
         <SectionLabel label="Format de fichier" />
         <div style={{ marginBottom: 16 }}>
-          <ExportRow icon={<PDFIcon />} color="#ef4444" bg="#fef2f2" label="PDF" sublabel="Document formaté" gratuit disabled={!has} onClick={() => dl('pdf', 'pdf')} />
-          <ExportRow icon={<DocIcon />} color="#3b82f6" bg="#eff6ff" label="Word (DOCX)" sublabel="Microsoft Word" gratuit disabled={!has} onClick={() => dl('docx', 'docx')} />
+          <ExportRow icon={<PDFIcon />} color="#ef4444" bg="#fef2f2" label="PDF" sublabel="Document formaté" gratuit disabled={!has} onClick={() => downloadBase64(transcript.exports.pdf_b64, `${transcript.title}.pdf`, 'application/pdf')} />
+          <ExportRow icon={<DocIcon />} color="#3b82f6" bg="#eff6ff" label="Word (DOCX)" sublabel="Microsoft Word" gratuit disabled={!has} onClick={() => downloadBase64(transcript.exports.docx_b64, `${transcript.title}.docx`, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')} />
           <ExportRow icon={<TxtIcon />} color="var(--ink-muted)" bg="var(--bg-warm)" label="Texte brut (TXT)" sublabel="Avec horodatages" gratuit disabled={!has} onClick={() => dl('txt', 'txt')} />
           <ExportRow icon={<SrtIcon />} color="#8b5cf6" bg="#f5f3ff" label="Sous-titres (SRT)" sublabel="Format standard" gratuit disabled={!has} onClick={() => dl('srt', 'srt')} />
           <ExportRow icon={<Mp3Icon />} color="#f59e0b" bg="#fffbeb" label="Audio (MP3)" sublabel="Fichier original" gratuit disabled={!has} onClick={() => dl('mp3', 'mp3')} />

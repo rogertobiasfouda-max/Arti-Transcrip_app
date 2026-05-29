@@ -159,6 +159,78 @@ def build_srt(segments: List[dict]) -> str:
     return "\n\n".join(blocks)
 
 
+def build_docx_b64(title: str, date: str, paragraphs: list) -> str:
+    """Générer un fichier Word (.docx) et retourner en base64."""
+    import base64, io
+    from docx import Document
+    from docx.shared import Pt, RGBColor
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+
+    doc = Document()
+
+    # Titre
+    h = doc.add_heading(title, level=1)
+    h.runs[0].font.color.rgb = RGBColor(0xE2, 0x23, 0x1A)
+
+    # Date
+    p_date = doc.add_paragraph(date)
+    p_date.runs[0].font.size = Pt(10)
+    p_date.runs[0].font.color.rgb = RGBColor(0x8A, 0x8A, 0x8A)
+
+    doc.add_paragraph()
+
+    # Paragraphes avec horodatages
+    for para in paragraphs:
+        p = doc.add_paragraph()
+        for seg in para:
+            run_ts = p.add_run(seg["ts"] + " ")
+            run_ts.font.size = Pt(9)
+            run_ts.font.color.rgb = RGBColor(0x8A, 0x8A, 0x8A)
+            run_ts.font.bold = True
+            run_text = p.add_run(seg["text"] + " ")
+            run_text.font.size = Pt(11)
+
+    buf = io.BytesIO()
+    doc.save(buf)
+    return base64.b64encode(buf.getvalue()).decode()
+
+
+def build_pdf_b64(title: str, date: str, paragraphs: list) -> str:
+    """Générer un fichier PDF et retourner en base64."""
+    import base64
+    from fpdf import FPDF
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+
+    # Titre
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_text_color(226, 35, 26)
+    pdf.cell(0, 10, title, ln=True)
+
+    # Date
+    pdf.set_font("Helvetica", "", 10)
+    pdf.set_text_color(138, 138, 138)
+    pdf.cell(0, 6, date, ln=True)
+    pdf.ln(4)
+
+    # Contenu
+    for para in paragraphs:
+        for seg in para:
+            pdf.set_font("Helvetica", "B", 9)
+            pdf.set_text_color(138, 138, 138)
+            pdf.write(5, seg["ts"] + " ")
+            pdf.set_font("Helvetica", "", 11)
+            pdf.set_text_color(26, 26, 26)
+            # Encoder en latin-1 pour fpdf (remplacer les caractères non supportés)
+            safe = seg["text"].encode("latin-1", errors="replace").decode("latin-1")
+            pdf.write(5, safe + " ")
+        pdf.ln(6)
+
+    return base64.b64encode(pdf.output()).decode()
+
+
 # ── Endpoints ──────────────────────────────────────────────────────────────
 
 @app.post("/transcribe")
@@ -206,9 +278,11 @@ async def transcribe_audio(file: UploadFile = File(...)):
             "segments": segments,
             "paragraphs": paragraphs,
             "exports": {
-                "txt": build_txt(title, date, paragraphs),
-                "md": build_md(title, date, paragraphs),
-                "srt": build_srt(segments),
+                "txt":      build_txt(title, date, paragraphs),
+                "md":       build_md(title, date, paragraphs),
+                "srt":      build_srt(segments),
+                "docx_b64": build_docx_b64(title, date, paragraphs),
+                "pdf_b64":  build_pdf_b64(title, date, paragraphs),
             },
         }
 
